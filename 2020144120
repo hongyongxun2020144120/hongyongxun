@@ -1,0 +1,6 @@
+str='lhktt-Confidence：0.3479'
+
+# #使用查找和字符字符串切片提取冒号字符后的字符部分，然后使用浮点函数提取的字符转换为浮点函数
+num_str_1 = str[19:]
+float(num_str_1 )
+print(num_str_1)
