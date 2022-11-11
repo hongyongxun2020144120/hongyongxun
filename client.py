@@ -1,33 +1,26 @@
-from socket import *
-from tkinter import *
-import tkinter
 
-def client():
-    IP = '10.128.36.75'
-    SERVER_PORT = 50000
-    BUFLEN = 1024
-
-    dataSocket = socket(AF_INET, SOCK_STREAM)
-
-    dataSocket.connect((IP, SERVER_PORT))
-
-    while True:
-        toSend = input('>>>')
-        if toSend == 'exit':
-            break
-        dataSocket.send(toSend.encode())
-
-        receved = dataSocket.recv(BUFLEN)
-        if not receved:
-            break
-        print(receved.decode())
-
-    dataSocket.close()
-window =tkinter.Tk()
-window.title('clientOperation')
-window.geometry('1000x200')
-
-button=tkinter.Button(window,text='在客户机操作',bg='#CC33CC', command=lambda : client())
-button.pack()
-top=mainloop()
-
+import socket
+import os
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect(('127.0.0.1',5848))
+def sendfile(conn):
+ str1 = conn.recv(1024)
+ filename = str1.decode('utf-8')
+ print('The client requests my file:',filename)
+ if os.path.exists(filename):
+     print('I have %s, begin to download!' % filename)
+     conn.send(b'yes')
+     conn.recv(1024)
+     size = 1024
+     with open(filename,'rb') as f:
+        while True:
+         data = f.read(size)
+         conn.send(data)
+         if len(data) < size:
+           break
+     print('%s is downloaded successfully!' % filename)
+ else:
+     print('Sorry, I have no %s' % filename)
+     conn.send(b'no')
+sendfile(s)
+s.close()

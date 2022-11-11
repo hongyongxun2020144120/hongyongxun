@@ -1,56 +1,31 @@
-from socket import *
-from tkinter import *
-import tkinter
 
-def server():
-	IP = ''
-	PORT = 50000
-	BUFLEN = 512
-
-	listenSocket = socket(AF_INET,SOCK_STREAM)
-	listenSocket.bind((IP,PORT))
-
-	listenSocket.listen(8)
-	print(f'�����������ɹ�����{PORT}�˿ڵȴ��ͻ�������...')
-
-	dataSocket,addr =listenSocket.accept()
-	print('����һ���ͻ�������:',addr)
-
-	while True:
-		receved = dataSocket.recv(BUFLEN)
-
-		if not receved:
-			break
-
-		info = receved.decode()
-		print(f'�յ��Է�����Ϣ��{info}')
-
-		dataSocket.send(f'����˽��յ�����Ϣ:{info}'.encode())
-
-	dataSocket.close()
-	listenSocket.close()
-
-window =tkinter.Tk()
-window.title('serverOperation')
-window.geometry('1000x200')
-
-button=tkinter.Button(window,text='主机上操作',bg='#CC33CC', command=lambda : server())
-button.pack()
-
-top=mainloop()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import socket
+import os
+filename = 'D:/BugBANG.txt'
+def send(s):
+ s.send(filename.encode('utf-8'))
+ str1 = s.recv(1024)
+ str2 = str1.decode('utf-8')
+ if str2 == 'no':
+    print('To get the file %s is failed!' % filename)
+ else:
+    s.send(b'I am ready!')
+    temp = filename.split('/')
+    myname = 'my_' + temp[len(temp) - 1]
+    size = 1024
+    with open(myname, 'wb') as f:
+        while True:
+            data = s.recv(size)
+            f.write(data)
+            if len(data) < size:
+             break
+    print('The downloaded file is %s.' % myname)
+    s.close()
+print('I want to get the file %s!' % filename)
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind(('127.0.0.1',5848))
+s.listen(5)
+print('Waiting for connecting...')
+while True:
+  (conn,addr)=s.accept()
+  send(conn)
